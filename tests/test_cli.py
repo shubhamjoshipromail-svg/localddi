@@ -70,7 +70,10 @@ def test_import_from_local_files(data_dir, forbid_downloads, tmp_path, capsys):
         "--rxnorm-dir", str(FIXTURES / "rrf"), "--ddinter-dir", str(ddinter),
     ])
     assert code == 0
-    assert "interactions stored               1" in capsys.readouterr().out
+    captured = capsys.readouterr()
+    assert "interactions stored               1" in captured.out
+    # Only category A was supplied, so the other 13 are reported as missing.
+    assert "WARNING: DDInter category file(s) B, C, D, G, H, J, L, M, N, P, R, S, V" in captured.err
 
 
 def test_own_csv_without_ddinter(data_dir, forbid_downloads, tmp_path):

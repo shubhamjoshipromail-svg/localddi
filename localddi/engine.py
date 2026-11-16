@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 
 from .importer import SEVERITY_RANK
 from .rxnorm import tty_rank
-from .textnorm import normalize_name, strip_trailing_qualifier
+from .textnorm import normalize_name, rewrites, split_combination
 
 MAX_DRUGS = 50  # same limit as the NLM list endpoint
 SUGGESTION_TTYS = ("IN", "PIN", "MIN", "BN")
@@ -33,7 +33,8 @@ class Drug:
     input_type: str  # "name" or "rxcui"
     resolved: bool = False
     concept: Concept | None = None
-    match: str | None = None  # exact | alias | source-name | qualifier-stripped | rxcui
+    # exact | alias | source-name | qualifier-stripped | normalized | salt-stripped | combination | rxcui
+    match: str | None = None
     reason: str | None = None  # why it did not resolve
     ingredients: list[Concept] = field(default_factory=list)
     suggestions: list[str] = field(default_factory=list)
@@ -134,30 +135,61 @@ class Engine:
         drug.resolved, drug.match = True, "rxcui"
         return drug
 
-    def resolve_name(self, name: str) -> Drug:
+    def _lookup(self, norm: str, ingredient_only: bool = False) -> tuple[Concept, list[Concept], str] | None:
+        """Exact lookup of one normalised key: (concept, ingredients, origin) or None."""
+        rows = self.conn.execute("SELECT rxcui, tty, origin FROM names WHERE norm = ?", (norm,)).fetchall()
+        if ingredient_only:
+            rows = [row for row in rows if row["tty"] in ("IN", "PIN", "MIN")]
+        if not rows:
+            return None
+        # RxNorm's own names win over spellings learned from an interaction source.
+        origin_rank = {"rxnorm": 0, "alias": 1}
+        best = min(
+            rows,
+            key=lambda r: (
+                origin_rank.get(r["origin"], 2),
+                tty_rank(r["tty"]),
+                int(r["rxcui"]) if r["rxcui"].isdigit() else 10**12,
+            ),
+        )
+        concept = self.concept(best["rxcui"])
+        return concept, self._ingredients(best["rxcui"]), best["origin"]
+
+    def _resolve_single(self, name: str) -> Drug:
         drug = Drug(input=name, input_type="name")
-        attempts = [(name, None)]
-        stripped = strip_trailing_qualifier(name)
-        if stripped and stripped != name.strip():
-            attempts.append((stripped, "qualifier-stripped"))
-        for text, forced in attempts:
-            norm = normalize_name(text)
-            if not norm:
+        for norm, rule in rewrites(name):
+            hit = self._lookup(norm, ingredient_only=rule == "salt-stripped")
+            if hit is None:
                 continue
-            rows = self.conn.execute("SELECT rxcui, tty, origin FROM names WHERE norm = ?", (norm,)).fetchall()
-            if not rows:
-                continue
-            best = min(rows, key=lambda r: (tty_rank(r["tty"]), int(r["rxcui"]) if r["rxcui"].isdigit() else 10**12))
-            drug.concept = self.concept(best["rxcui"])
-            drug.ingredients = self._ingredients(best["rxcui"])
+            drug.concept, drug.ingredients, origin = hit
             if not drug.ingredients:
                 drug.reason = "no-ingredient"
                 return drug
-            origin = best["origin"]
-            drug.match = forced or {"rxnorm": "exact", "alias": "alias"}.get(origin, "source-name")
+            drug.match = rule or {"rxnorm": "exact", "alias": "alias"}.get(origin, "source-name")
             drug.resolved = True
             return drug
         drug.reason = "unknown-name"
+        return drug
+
+    def resolve_name(self, name: str) -> Drug:
+        """Resolve a drug name by exact lookup, then by the fixed rewrites in ``textnorm``.
+
+        A name written as a combination ("A/B", "A-B", "A with B") resolves only
+        if every part does. Nothing is matched by similarity.
+        """
+        drug = self._resolve_single(name)
+        if drug.resolved or drug.reason == "no-ingredient":
+            return drug
+        parts = [self._resolve_single(part) for part in split_combination(name)]
+        if parts and all(part.resolved for part in parts):
+            ingredients = {c.rxcui: c for part in parts for c in part.ingredients}
+            drug.ingredients = sorted(ingredients.values(), key=lambda c: c.name)
+            # Use RxNorm's own multi-ingredient concept when one has exactly these ingredients.
+            hit = self._lookup(normalize_name(" / ".join(c.name for c in drug.ingredients)))
+            if hit and {c.rxcui for c in hit[1]} == set(ingredients):
+                drug.concept = hit[0]
+            drug.match, drug.reason, drug.resolved = "combination", None, True
+            return drug
         drug.suggestions = self.suggest(name)
         return drug
 

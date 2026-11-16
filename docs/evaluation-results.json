@@ -1,0 +1,459 @@
+{
+  "database": {
+    "imported_at": "2026-11-16T05:56:24+00:00",
+    "rxnorm_version": "2026-11-02",
+    "interactions": 176817,
+    "sources": [
+      "DDInter 2.0"
+    ]
+  },
+  "onc_high_priority": {
+    "pairs": 1150,
+    "drugs": 123,
+    "testable_pairs": 793,
+    "outcome": {
+      "listed": 721,
+      "untestable_drug_not_in_rxnorm": 357,
+      "not_listed_both_drugs_in_source": 42,
+      "not_listed_drug_absent_from_source": 30
+    },
+    "listed_by_severity": {
+      "major": 663,
+      "moderate": 58
+    },
+    "recall_of_testable": 0.9092,
+    "recall_as_major_or_worse": 0.8361,
+    "drugs_not_in_rxnorm": [
+      "Astemizole",
+      "Bepridil",
+      "Domperidone",
+      "Ergonovine",
+      "Halofantrine",
+      "Indinavir",
+      "Levomethadyl Acetate",
+      "Mesoridazine",
+      "Probucol",
+      "Saquinavir",
+      "Sparfloxacin",
+      "Telithromycin",
+      "Terfenadine",
+      "Ticlopidine"
+    ],
+    "drugs_most_often_in_unlisted_pairs": [
+      [
+        "Sulpiride",
+        30
+      ],
+      [
+        "Cocaine",
+        29
+      ],
+      [
+        "Lopinavir",
+        10
+      ],
+      [
+        "Tipranavir",
+        4
+      ],
+      [
+        "Amiodarone",
+        2
+      ],
+      [
+        "Anagrelide",
+        2
+      ],
+      [
+        "Arsenic trioxide",
+        2
+      ],
+      [
+        "Azithromycin",
+        2
+      ]
+    ],
+    "pairs_not_listed": [
+      [
+        "Amiodarone",
+        "Cocaine"
+      ],
+      [
+        "Amiodarone",
+        "Sulpiride"
+      ],
+      [
+        "Anagrelide",
+        "Cocaine"
+      ],
+      [
+        "Anagrelide",
+        "Sulpiride"
+      ],
+      [
+        "Arsenic trioxide",
+        "Cocaine"
+      ],
+      [
+        "Arsenic trioxide",
+        "Sulpiride"
+      ],
+      [
+        "Azithromycin",
+        "Cocaine"
+      ],
+      [
+        "Azithromycin",
+        "Sulpiride"
+      ],
+      [
+        "Bosentan",
+        "Lopinavir"
+      ],
+      [
+        "Chloroquine",
+        "Sulpiride"
+      ],
+      [
+        "Chlorpromazine",
+        "Cocaine"
+      ],
+      [
+        "Chlorpromazine",
+        "Sulpiride"
+      ],
+      [
+        "Cisapride",
+        "Cocaine"
+      ],
+      [
+        "Cisapride",
+        "Sulpiride"
+      ],
+      [
+        "Citalopram",
+        "Cocaine"
+      ],
+      [
+        "Citalopram",
+        "Sulpiride"
+      ],
+      [
+        "Clarithromycin",
+        "Cocaine"
+      ],
+      [
+        "Clarithromycin",
+        "Sulpiride"
+      ],
+      [
+        "Cocaine",
+        "Disopyramide"
+      ],
+      [
+        "Cocaine",
+        "Dofetilide"
+      ],
+      [
+        "Cocaine",
+        "Dronedarone"
+      ],
+      [
+        "Cocaine",
+        "Droperidol"
+      ],
+      [
+        "Cocaine",
+        "Erythromycin"
+      ],
+      [
+        "Cocaine",
+        "Escitalopram"
+      ],
+      [
+        "Cocaine",
+        "Flecainide"
+      ],
+      [
+        "Cocaine",
+        "Haloperidol"
+      ],
+      [
+        "Cocaine",
+        "Ibutilide"
+      ],
+      [
+        "Cocaine",
+        "Methadone"
+      ],
+      [
+        "Cocaine",
+        "Moxifloxacin"
+      ],
+      [
+        "Cocaine",
+        "Ondansetron"
+      ],
+      [
+        "Cocaine",
+        "Pentamidine"
+      ],
+      [
+        "Cocaine",
+        "Pimozide"
+      ],
+      [
+        "Cocaine",
+        "Procainamide"
+      ],
+      [
+        "Cocaine",
+        "Quinidine"
+      ],
+      [
+        "Cocaine",
+        "Sevoflurane"
+      ],
+      [
+        "Cocaine",
+        "Sotalol"
+      ],
+      [
+        "Cocaine",
+        "Sulpiride"
+      ],
+      [
+        "Cocaine",
+        "Thioridazine"
+      ],
+      [
+        "Cocaine",
+        "Vandetanib"
+      ],
+      [
+        "Dihydroergotamine",
+        "Lopinavir"
+      ],
+      [
+        "Dihydroergotamine",
+        "Tipranavir"
+      ],
+      [
+        "Disopyramide",
+        "Sulpiride"
+      ],
+      [
+        "Dofetilide",
+        "Sulpiride"
+      ],
+      [
+        "Dronedarone",
+        "Sulpiride"
+      ],
+      [
+        "Droperidol",
+        "Sulpiride"
+      ],
+      [
+        "Ergotamine",
+        "Lopinavir"
+      ],
+      [
+        "Ergotamine",
+        "Tipranavir"
+      ],
+      [
+        "Erythromycin",
+        "Sulpiride"
+      ],
+      [
+        "Escitalopram",
+        "Sulpiride"
+      ],
+      [
+        "Flecainide",
+        "Sulpiride"
+      ],
+      [
+        "Haloperidol",
+        "Sulpiride"
+      ],
+      [
+        "Ibutilide",
+        "Sulpiride"
+      ],
+      [
+        "Irinotecan",
+        "Lopinavir"
+      ],
+      [
+        "Irinotecan",
+        "Tipranavir"
+      ],
+      [
+        "Lopinavir",
+        "Lovastatin"
+      ],
+      [
+        "Lopinavir",
+        "Methylergometrine"
+      ],
+      [
+        "Lopinavir",
+        "Rifabutin"
+      ],
+      [
+        "Lopinavir",
+        "Rifampicin"
+      ],
+      [
+        "Lopinavir",
+        "Rifapentine"
+      ],
+      [
+        "Lopinavir",
+        "Simvastatin"
+      ],
+      [
+        "Methadone",
+        "Sulpiride"
+      ],
+      [
+        "Methylergometrine",
+        "Tipranavir"
+      ],
+      [
+        "Moxifloxacin",
+        "Sulpiride"
+      ],
+      [
+        "Ondansetron",
+        "Sulpiride"
+      ],
+      [
+        "Pentamidine",
+        "Sulpiride"
+      ],
+      [
+        "Pimozide",
+        "Sulpiride"
+      ],
+      [
+        "Procainamide",
+        "Sulpiride"
+      ],
+      [
+        "Quinidine",
+        "Sulpiride"
+      ],
+      [
+        "Sevoflurane",
+        "Sulpiride"
+      ],
+      [
+        "Sotalol",
+        "Sulpiride"
+      ],
+      [
+        "Sulpiride",
+        "Thioridazine"
+      ],
+      [
+        "Sulpiride",
+        "Vandetanib"
+      ]
+    ]
+  },
+  "nlm_archive": {
+    "captures": 52,
+    "captures_with_interactions": 25,
+    "by_source": {
+      "DrugBank": {
+        "distinct_pairs": 7122,
+        "testable_pairs": 3050,
+        "outcome": {
+          "not_listed": 2167,
+          "untestable_rxcui_not_in_current_rxnorm": 4072,
+          "listed": 883
+        },
+        "listed_by_severity": {
+          "unknown": 596,
+          "moderate": 218,
+          "minor": 36,
+          "major": 33
+        },
+        "recall_of_testable": 0.2895
+      },
+      "ONCHigh": {
+        "distinct_pairs": 6,
+        "testable_pairs": 5,
+        "outcome": {
+          "listed": 5,
+          "untestable_rxcui_not_in_current_rxnorm": 1
+        },
+        "listed_by_severity": {
+          "major": 5
+        },
+        "recall_of_testable": 1.0
+      }
+    }
+  },
+  "medicare_part_d_names": {
+    "generic": {
+      "distinct_names": 1982,
+      "top_100_resolved": 94,
+      "top_300_resolved": 274,
+      "top_1000_resolved": 847,
+      "share_of_claims_resolved": 0.9493,
+      "match_rules_top_300": {
+        "exact": 195,
+        "normalized": 58,
+        "combination": 15,
+        "salt-stripped": 4,
+        "alias": 1,
+        "qualifier-stripped": 1
+      },
+      "unresolved_in_top_100": [
+        "Insulin Glargine,Hum.Rec.Anlog",
+        "Amoxicillin/Potassium Clav",
+        "Fluticasone/Umeclidin/Vilanter",
+        "Pen Needle, Diabetic",
+        "Fluticasone Propion/Salmeterol",
+        "Nitrofurantoin Monohyd/M-Cryst"
+      ]
+    },
+    "brand": {
+      "distinct_names": 3508,
+      "top_100_resolved": 96,
+      "top_300_resolved": 270,
+      "top_1000_resolved": 832,
+      "share_of_claims_resolved": 0.9504,
+      "match_rules_top_300": {
+        "exact": 190,
+        "normalized": 69,
+        "combination": 10,
+        "salt-stripped": 1
+      },
+      "unresolved_in_top_100": [
+        "Amoxicillin-Clavulanate Potass",
+        "Trelegy Ellipta",
+        "Lantus Solostar",
+        "Nitrofurantoin Mono-Macro"
+      ]
+    }
+  },
+  "lookup_speed": {
+    "2_drugs_ms": {
+      "median": 0.08,
+      "p95": 0.1
+    },
+    "10_drugs_ms": {
+      "median": 0.42,
+      "p95": 0.53
+    },
+    "25_drugs_ms": {
+      "median": 1.45,
+      "p95": 1.75
+    }
+  }
+}

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "localddi"
-version = "0.1.0"
+version = "0.1.1"
 description = "Self-hosted drug-drug interaction API with endpoints compatible with the discontinued NLM RxNav Interaction API. Not for clinical use."
 readme = "README.md"
 requires-python = ">=3.10"

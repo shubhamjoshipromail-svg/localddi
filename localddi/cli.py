@@ -77,6 +77,14 @@ def cmd_import(args: argparse.Namespace) -> int:
                 else download.fetch_ddinter(cache, args.refresh, linked_only=args.ddinter_linked_only)
             )
             print(f"Reading DDInter from {directory}")
+            present = {path.name for path in directory.glob("ddinter_downloads_code_*.csv")}
+            missing = [name[-5] for name in download.DDINTER_FILES if name not in present]
+            if missing:
+                print(
+                    f"WARNING: DDInter category file(s) {', '.join(sorted(missing))} are not in {directory}. "
+                    "Interactions between drugs outside the categories you do have will be missing.",
+                    file=sys.stderr,
+                )
             sources.append(ddinter_source(directory))
 
     if args.csv:
@@ -138,7 +146,8 @@ def cmd_check(args: argparse.Namespace) -> int:
     for drug in drugs:
         if drug.resolved:
             names = ", ".join(c.name for c in drug.ingredients)
-            print(f"  {drug.input!r} -> {names} (RxCUI {drug.concept.rxcui}, {drug.match})")
+            rxcui = f"RxCUI {drug.concept.rxcui}, " if drug.concept else ""
+            print(f"  {drug.input!r} -> {names} ({rxcui}{drug.match})")
         else:
             hint = f"; did you mean: {', '.join(drug.suggestions)}?" if drug.suggestions else ""
             print(f"  {drug.input!r} -> NOT RECOGNISED ({drug.reason}){hint}")

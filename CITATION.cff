@@ -7,7 +7,7 @@ type: software
 authors:
   - family-names: Joshi
     given-names: Shubham
-version: 0.1.0
+version: 0.1.1
 date-released: 2026-11-15
 license: MIT
 repository-code: "https://github.com/shubhamjoshipromail-svg/localddi"

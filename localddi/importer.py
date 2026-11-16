@@ -9,6 +9,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import re
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
@@ -35,6 +36,9 @@ DDINTER_DISCLAIMER = (
     "DDInter data is licensed for non-commercial use only (CC BY-NC-SA 4.0). It is a research "
     "database and is not a substitute for professional medical judgement."
 )
+
+
+_USP_SUFFIX = re.compile(r"\s*(\(USP\)|,\s*USP)\s*$")
 
 
 def normalize_severity(raw: str | None) -> str:
@@ -171,6 +175,14 @@ class NameIndex:
             key = normalize_name(name)
             if key:
                 self.entries[key].setdefault(rxcui, "rxnorm")
+        # RxNorm writes a few ingredients as "vasopressin (USP)" or "sennosides, USP";
+        # index them without the pharmacopoeia tag too.
+        for name, rxcui in rx.names:
+            plain = _USP_SUFFIX.sub("", name)
+            if plain != name and rx.concepts[rxcui][1] in ("IN", "PIN"):
+                key = normalize_name(plain)
+                if key and key not in self.entries:
+                    self.entries[key][rxcui] = "rxnorm"
         self.aliases_applied = 0
         for alias, target in aliases:
             key = normalize_name(alias)

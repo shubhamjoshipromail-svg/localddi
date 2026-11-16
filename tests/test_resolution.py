@@ -15,6 +15,7 @@ import pytest
         ("acetylsalicylic acid", "1191", "alias"),
         ("Paracetamol", "161", "alias"),
         ("salbutamol", "435", "alias"),
+        ("Coumadin", "11289", "alias"),
         ("Acyclovir (topical)", "281", "source-name"),
         ("Ibuprofen (oral)", "5640", "qualifier-stripped"),
     ],

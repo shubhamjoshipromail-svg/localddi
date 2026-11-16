@@ -44,3 +44,6 @@ oxybuprocaine,benoxinate
 cinchocaine,dibucaine
 rifamycin,rifamycin SV
 ferrous sulfate anhydrous,ferrous sulfate
+insulin aspart,"insulin aspart, human"
+# A US brand that left RxNorm's prescribable subset when it was discontinued.
+coumadin,warfarin
