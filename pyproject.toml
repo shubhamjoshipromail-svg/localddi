@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "localddi"
-version = "0.1.1"
+version = "0.2.0"
 description = "Self-hosted drug-drug interaction API with endpoints compatible with the discontinued NLM RxNav Interaction API. Not for clinical use."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -42,7 +42,7 @@ Issues = "https://github.com/shubhamjoshipromail-svg/localddi/issues"
 include = ["localddi*"]
 
 [tool.setuptools.package-data]
-localddi = ["data/*.csv", "fixtures/*.csv", "fixtures/rrf/*.RRF"]
+localddi = ["data/*.csv", "fixtures/*.csv", "fixtures/rrf/*.RRF", "static/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,4 +1,4 @@
-"""Command line: ``localddi import | serve | check | status``."""
+"""Command line: ``localddi demo | import | serve | check | status``."""
 
 from __future__ import annotations
 
@@ -130,6 +130,18 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_demo(args: argparse.Namespace) -> int:
+    if not config.db_path().exists():
+        result = cmd_import(build_parser().parse_args(["import", "--demo"]))
+        if result:
+            return result
+    host = "localhost" if args.host in {"0.0.0.0", "::"} else args.host
+    if ":" in host:
+        host = f"[{host}]"
+    print(f"Open http://{host}:{args.port}", flush=True)
+    return cmd_serve(args)
+
+
 def _engine():
     from .engine import Engine
 
@@ -194,6 +206,11 @@ def build_parser() -> argparse.ArgumentParser:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8080)
     serve.set_defaults(func=cmd_serve)
+
+    demo = sub.add_parser("demo", help="load the synthetic fixture if no database exists, then serve the web page")
+    demo.add_argument("--host", default="127.0.0.1")
+    demo.add_argument("--port", type=int, default=8080)
+    demo.set_defaults(func=cmd_demo)
 
     check = sub.add_parser("check", help="check drugs from the command line (names or RxCUIs)")
     check.add_argument("drugs", nargs="+")

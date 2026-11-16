@@ -2,6 +2,19 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-11-16
+
+### Added
+
+- An offline, self-contained try-it page at `/` with example inputs, interaction severity and sources, name-resolution details, unresolved-name suggestions and an incomplete-answer warning. The medical disclaimer stays visible, and the footer shows loaded data and its licence. Optional API keys stay in page memory.
+- `localddi demo`: loads the bundled synthetic fixture only when no database exists, then serves the page. Supports `--host` and `--port`.
+- A tag-triggered GitHub Actions workflow to build and push versioned and `latest` container images to GHCR.
+- Tests for the page, offline assets, demo startup and existing API paths.
+
+### Changed
+
+- README quickstart now leads with Python without a clone, the container image and Docker Compose, followed by instructions for loading real data.
+
 ## [0.1.1] - 2026-11-15
 
 ### Added

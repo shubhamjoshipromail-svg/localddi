@@ -1,6 +1,6 @@
 """localddi: a self-hosted drug-drug interaction API. Not for clinical use."""
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 DISCLAIMER = (
     "localddi is NOT a medical device and is NOT clinically validated. Results come from "

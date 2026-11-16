@@ -17,6 +17,7 @@ def no_network(monkeypatch):
 
 
 def test_queries_work_with_the_network_blocked(client, no_network):
+    assert client.get("/").status_code == 200
     body = client.get("/v1/interactions", params={"drugs": "warfarin,aspirin"}).json()
     assert body["summary"]["interactions_found"] == 1
     assert client.get("/v1/drugs/resolve", params={"name": "warfarine"}).status_code == 200

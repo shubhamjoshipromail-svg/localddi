@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>localddi · Check your loaded interaction data</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f6f3;
+      --surface: #fff;
+      --text: #202923;
+      --muted: #536058;
+      --border: #ccd3cd;
+      --accent: #216346;
+      --accent-text: #fff;
+      --warning-bg: #fff4d9;
+      --warning-text: #614608;
+      --danger-bg: #fbe6e5;
+      --danger-text: #8a2825;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151b18;
+        --surface: #1e2721;
+        --text: #edf1eb;
+        --muted: #bbc6bd;
+        --border: #48584b;
+        --accent: #9ed7b6;
+        --accent-text: #13291b;
+        --warning-bg: #372d18;
+        --warning-text: #f5d58e;
+        --danger-bg: #402323;
+        --danger-text: #ffb5ad;
+      }
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 1rem/1.6 system-ui, sans-serif; }
+    main, footer { max-width: 54rem; margin: auto; padding: 1.5rem; }
+    header { margin: 1rem 0 1.5rem; }
+    .brand { color: var(--accent); font-weight: 750; letter-spacing: .04em; }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; margin: .5rem 0 .8rem; }
+    h2 { font-size: 1.2rem; margin: 0 0 .75rem; }
+    p { margin: .5rem 0; }
+    a { color: var(--accent); text-underline-offset: .2em; }
+    .muted, .detail { color: var(--muted); }
+    .panel { padding: 1.4rem; border: 1px solid var(--border); border-radius: .8rem; background: var(--surface); }
+    .notice { padding: 1rem 1.2rem; border-radius: .6rem; background: var(--warning-bg); color: var(--warning-text); }
+    .disclaimer { margin-bottom: 1.5rem; border: 1px solid var(--warning-text); font-size: .9rem; }
+    .disclaimer strong { display: block; }
+    label { display: block; font-weight: 650; margin-bottom: .4rem; }
+    input, button { font: inherit; border-radius: .4rem; }
+    input { width: 100%; padding: .7rem; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+    button { cursor: pointer; padding: .65rem 1rem; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-text); }
+    button:disabled { cursor: wait; opacity: .65; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .hint { font-size: .88rem; color: var(--muted); }
+    .examples { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0 1.2rem; }
+    .chip, .secondary { background: var(--surface); color: var(--accent); }
+    .chip { font-size: .82rem; padding: .35rem .65rem; border-color: var(--border); border-radius: 2rem; }
+    .key { margin-top: 1.2rem; border-top: 1px solid var(--border); padding-top: 1.2rem; }
+    .key-row { display: flex; gap: .6rem; align-items: stretch; }
+    .key-row input { flex: 1; min-width: 0; }
+    .key-row button { flex-shrink: 0; }
+    section, #feedback { margin-top: 1.3rem; }
+    ul { padding: 0; margin: 0; list-style: none; }
+    .result { border-top: 1px solid var(--border); padding: 1rem 0; overflow-wrap: anywhere; }
+    .result:first-child { border-top: 0; }
+    .result:last-child { padding-bottom: 0; }
+    .result-title { font-weight: 650; }
+    .badge { display: inline-block; font-weight: 700; font-size: .8rem; padding: .15rem .55rem; border-radius: 2rem; margin-bottom: .4rem; background: var(--bg); border: 1px solid var(--border); }
+    .major, .contraindicated, .unresolved { background: var(--danger-bg); color: var(--danger-text); }
+    .moderate { background: var(--warning-bg); color: var(--warning-text); }
+    .detail { font-size: .9rem; }
+    #incomplete { margin-bottom: 1rem; }
+    pre { overflow-x: auto; padding: .75rem; background: var(--surface); color: var(--text); border-radius: .4rem; }
+    footer { padding-top: 0; font-size: .85rem; color: var(--muted); overflow-wrap: anywhere; }
+    footer nav { display: flex; gap: 1rem; margin-top: 1rem; }
+    #source-list li { margin-top: .8rem; }
+    @media (max-width: 480px) {
+      main, footer { padding-left: 1rem; padding-right: 1rem; }
+      .panel { padding: 1rem; }
+      .key-row { flex-direction: column; }
+      #check-button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand">localddi</div>
+      <h1>Check the interactions in your data.</h1>
+      <p class="muted">Enter drug names to look up the pairs listed in your locally loaded sources.</p>
+    </header>
+
+    <aside class="notice disclaimer" aria-label="Medical disclaimer">
+      <strong>Not for clinical use.</strong>
+      <p>localddi is NOT a medical device and is NOT clinically validated. Results come from third-party research data that may be incomplete, outdated or wrong. The absence of a listed interaction does not mean a combination is safe. Do not use this output to make treatment decisions; consult a qualified clinician and an approved drug reference.</p>
+    </aside>
+
+    <div class="panel">
+      <form id="check-form" autocomplete="off">
+        <label for="drugs">Drug names</label>
+        <input id="drugs" type="text" required value="warfarin, aspirin" aria-describedby="drug-hint" spellcheck="false">
+        <p id="drug-hint" class="hint">Separate names with commas. Examples may be absent from your loaded data.</p>
+        <div class="examples" aria-label="Example drug combinations">
+          <button class="chip" type="button" data-drugs="warfarin, aspirin">warfarin, aspirin</button>
+          <button class="chip" type="button" data-drugs="Metformin HCl, Lisinopril-Hydrochlorothiazide">Metformin HCl, Lisinopril-Hydrochlorothiazide</button>
+          <button class="chip" type="button" data-drugs="sildenafil, nitroglycerin">sildenafil, nitroglycerin</button>
+        </div>
+        <button id="check-button" type="submit">Check</button>
+      </form>
+      <div class="key">
+        <label for="api-key">API key <span class="hint">(if your server requires one)</span></label>
+        <div class="key-row">
+          <input id="api-key" type="password" autocomplete="off" aria-describedby="key-hint" spellcheck="false">
+          <button id="refresh-status" type="button" class="secondary">Load status</button>
+        </div>
+        <p id="key-hint" class="hint">Kept only in this page's memory. Sent to this server with API calls.</p>
+      </div>
+    </div>
+
+    <noscript><p class="notice">Enable JavaScript to check drugs here, or use the API and CLI directly.</p></noscript>
+    <div id="feedback" class="notice" role="alert" hidden></div>
+    <section id="no-data" class="notice" aria-labelledby="no-data-title" hidden>
+      <h2 id="no-data-title">Load data to start</h2>
+      <p>Try the tiny synthetic fixture (made-up rows, never for real checks):</p>
+      <pre><code>localddi import --demo</code></pre>
+      <p>Or load real data. DDInter requires acceptance of its CC BY-NC-SA 4.0 terms: non-commercial use only.</p>
+      <pre><code>localddi import</code></pre>
+      <p>Run a command in the server's environment, then select Load status or Check again.</p>
+    </section>
+
+    <section id="results" class="panel" aria-labelledby="results-title" hidden>
+      <h2 id="results-title" tabindex="-1">Interactions</h2>
+      <p id="incomplete" class="notice" role="alert" hidden><strong>Incomplete answer.</strong> Some inputs could not be resolved. Interactions involving those inputs could not be checked. Suggestions are never applied automatically.</p>
+      <p id="summary"></p>
+      <ul id="interaction-list"></ul>
+    </section>
+    <section id="resolution" class="panel" aria-labelledby="resolution-title" hidden>
+      <h2 id="resolution-title">How your inputs resolved</h2>
+      <ul id="drug-list"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>Loaded data</strong> · <span id="status-text" role="status">Loading status…</span></p>
+    <ul id="source-list"></ul>
+    <p>Code: MIT. Imported data keeps its own licence. DDInter data is CC BY-NC-SA 4.0, for non-commercial use only.</p>
+    <nav aria-label="Project links"><a href="/docs">API docs</a><a href="https://github.com/shubhamjoshipromail-svg/localddi">GitHub</a></nav>
+  </footer>
+
+  <script>
+    "use strict";
+    const byId = (id) => document.getElementById(id);
+    const form = byId("check-form");
+    const checkButton = byId("check-button");
+    const feedback = byId("feedback");
+    const noData = byId("no-data");
+
+    function element(tag, text, className) {
+      const node = document.createElement(tag);
+      if (text !== undefined) node.textContent = text;
+      if (className) node.className = className;
+      return node;
+    }
+
+    async function api(path, body) {
+      const headers = {Accept: "application/json"};
+      const key = byId("api-key").value;
+      if (key) headers["X-API-Key"] = key;
+      const options = {method: body === undefined ? "GET" : "POST", headers, cache: "no-store"};
+      if (body !== undefined) {
+        headers["Content-Type"] = "application/json";
+        options.body = JSON.stringify(body);
+      }
+      const response = await fetch(path, options);
+      if (!response.ok) {
+        let message = `Server returned ${response.status}.`;
+        try {
+          const error = await response.json();
+          if (typeof error.error === "string") message = error.error;
+        } catch { /* Keep the status message for non-JSON errors. */ }
+        const error = new Error(message);
+        error.status = response.status;
+        throw error;
+      }
+      return response.json();
+    }
+
+    function showError(error) {
+      noData.hidden = error.status !== 503;
+      feedback.textContent = error.status === 401
+        ? "This server requires an API key. Enter the key above, then select Load status or Check."
+        : error.message || "Could not reach the server. Try again.";
+      feedback.hidden = false;
+    }
+
+    async function loadStatus() {
+      byId("status-text").textContent = "Loading status…";
+      byId("source-list").replaceChildren();
+      try {
+        const status = await api("/v1/status");
+        byId("status-text").textContent = `${status.interactions} interactions · RxNorm ${status.rxnorm_version}`;
+        for (const source of status.sources) {
+          const item = element("li");
+          item.append(element("strong", `${source.name}${source.version ? ` ${source.version}` : ""}`));
+          item.append(element("div", `${source.interactions} interactions · Licence: ${source.license || "Not specified"}`));
+          if (source.attribution) item.append(element("div", source.attribution));
+          if (source.disclaimer) item.append(element("div", source.disclaimer));
+          byId("source-list").append(item);
+        }
+        noData.hidden = true;
+        feedback.hidden = true;
+      } catch (error) {
+        byId("status-text").textContent = error.status === 503 ? "No data loaded." : "Status unavailable.";
+        showError(error);
+      }
+    }
+
+    function renderResults(data) {
+      byId("incomplete").hidden = data.summary.complete !== false;
+      byId("summary").textContent = data.interactions.length
+        ? `${data.summary.interactions_found} interaction(s) listed across ${data.summary.pairs_checked} input pair(s).`
+        : "No interactions listed in the loaded data. This does not mean the combination is safe.";
+      byId("interaction-list").replaceChildren();
+      const severities = new Set(["contraindicated", "major", "moderate", "minor", "unknown"]);
+      for (const interaction of data.interactions) {
+        const item = element("li", undefined, "result");
+        const severity = severities.has(interaction.severity) ? interaction.severity : "unknown";
+        item.append(element("span", interaction.severity, `badge ${severity}`));
+        item.append(element("div", `${interaction.drug_a.name} + ${interaction.drug_b.name}`, "result-title"));
+        item.append(element("div", `Source: ${interaction.source}`, "detail"));
+        if (interaction.description) item.append(element("p", interaction.description));
+        byId("interaction-list").append(item);
+      }
+
+      byId("drug-list").replaceChildren();
+      for (const drug of data.drugs) {
+        const item = element("li", undefined, "result");
+        item.append(element("div", drug.input, "result-title"));
+        if (drug.resolved) {
+          item.append(element("div", drug.name || drug.ingredients.map((ingredient) => ingredient.name).join(" + ")));
+          item.append(element("div", `RxCUI: ${drug.rxcui || "No single concept (combination)"} · Match rule: ${drug.match}`, "detail"));
+          for (const ingredient of drug.ingredients) {
+            item.append(element("div", `Ingredient: ${ingredient.name} · RxCUI: ${ingredient.rxcui}`, "detail"));
+          }
+        } else {
+          item.append(element("span", "Unresolved", "badge unresolved"));
+          item.append(element("div", `Reason: ${drug.reason || "Not recognised"}`, "detail"));
+          item.append(element("div", drug.suggestions.length
+            ? `Suggestions (not applied): ${drug.suggestions.join(", ")}`
+            : "No suggestions available.", "detail"));
+        }
+        byId("drug-list").append(item);
+      }
+      byId("results").hidden = false;
+      byId("resolution").hidden = false;
+      byId("results-title").focus();
+    }
+
+    document.querySelectorAll("[data-drugs]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        byId("drugs").value = chip.dataset.drugs;
+        byId("drugs").focus();
+      });
+    });
+
+    byId("refresh-status").addEventListener("click", loadStatus);
+    byId("api-key").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        loadStatus();
+      }
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      feedback.hidden = true;
+      noData.hidden = true;
+      byId("results").hidden = true;
+      byId("resolution").hidden = true;
+      const drugs = byId("drugs").value.split(",").map((name) => name.trim()).filter(Boolean);
+      if (!drugs.length) {
+        feedback.textContent = "Enter at least one drug name.";
+        feedback.hidden = false;
+        return;
+      }
+      checkButton.disabled = true;
+      checkButton.textContent = "Checking…";
+      form.setAttribute("aria-busy", "true");
+      try {
+        const data = await api("/v1/interactions", {drugs});
+        renderResults(data);
+        await loadStatus();
+      } catch (error) {
+        showError(error);
+      } finally {
+        checkButton.disabled = false;
+        checkButton.textContent = "Check";
+        form.removeAttribute("aria-busy");
+      }
+    });
+
+    loadStatus();
+  </script>
+</body>
+</html>

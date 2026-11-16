@@ -16,7 +16,7 @@ def db_path() -> Path:
 
 
 def api_key() -> str | None:
-    """If set, every endpoint except /health requires this key."""
+    """If set, API endpoints except /health require this key; the web page stays public."""
     return os.environ.get("LOCALDDI_API_KEY") or None
 
 

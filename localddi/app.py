@@ -9,7 +9,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from . import DISCLAIMER, REPO_URL, __version__, config, db, nlm
@@ -124,6 +124,10 @@ def create_app(database: Path | None = None) -> FastAPI:
         return JSONResponse({"error": exc.detail}, status_code=exc.status_code)
 
     # ------------------------------------------------------------------ service
+
+    @app.get("/", include_in_schema=False)
+    def home() -> FileResponse:
+        return FileResponse(Path(__file__).parent / "static" / "index.html", media_type="text/html")
 
     @app.get("/health", tags=["service"], summary="Liveness check")
     def health() -> dict:

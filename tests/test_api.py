@@ -161,8 +161,17 @@ def test_status(client):
 def test_openapi_and_docs(client):
     schema = client.get("/openapi.json").json()
     assert schema["info"]["title"] == "localddi"
-    for path in ("/v1/interactions", "/REST/interaction/list.json", "/REST/interaction/interaction.json"):
-        assert path in schema["paths"]
+    for path, methods in {
+        "/health": {"get"},
+        "/v1/status": {"get"},
+        "/v1/interactions": {"get", "post"},
+        "/v1/drugs/resolve": {"get"},
+        "/v1/drugs/{rxcui}/interactions": {"get"},
+        "/REST/interaction/list.json": {"get"},
+        "/REST/interaction/interaction.json": {"get"},
+        "/REST/interaction/sources.json": {"get"},
+    }.items():
+        assert methods <= schema["paths"][path].keys()
     assert client.get("/docs").status_code == 200
 
 

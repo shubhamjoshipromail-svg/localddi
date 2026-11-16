@@ -1,6 +1,7 @@
 """Command-line behaviour, including the licence gate. No network is used."""
 
 import json
+from unittest.mock import Mock
 
 import pytest
 
@@ -39,6 +40,57 @@ def test_demo_import_then_check(data_dir, forbid_downloads, capsys):
 
     assert cli.main(["status"]) == 0
     assert json.loads(capsys.readouterr().out)["interactions"] == 8
+
+
+@pytest.mark.parametrize(("options", "host", "port", "url"), [
+    ([], "127.0.0.1", 8080, "http://127.0.0.1:8080"),
+    (["--host", "0.0.0.0", "--port", "8099"], "0.0.0.0", 8099, "http://localhost:8099"),
+    (["--host", "::1"], "::1", 8080, "http://[::1]:8080"),
+])
+def test_demo_builds_fixture_then_serves(data_dir, forbid_downloads, monkeypatch, capsys, options, host, port, url):
+    run = Mock()
+    monkeypatch.setattr("uvicorn.run", run)
+    assert cli.main(["demo", *options]) == 0
+    assert (data_dir / "localddi.sqlite").exists()
+    report = json.loads((data_dir / "import-report.json").read_text())
+    assert report["interactions_total"] == 8
+    assert list(report["sources"]) == ["DEMO"]
+    assert url in capsys.readouterr().out
+    run.assert_called_once_with("localddi.app:app", host=host, port=port, log_level="info")
+
+
+def test_demo_preserves_existing_database(data_dir, forbid_downloads, monkeypatch, capsys):
+    cli.main(["import", "--demo"])
+    database = data_dir / "localddi.sqlite"
+    original = database.read_bytes()
+    original_report = (data_dir / "import-report.json").read_bytes()
+    capsys.readouterr()
+    run = Mock()
+    monkeypatch.setattr("uvicorn.run", run)
+    monkeypatch.setattr(cli, "cmd_import", Mock(side_effect=AssertionError("existing database must not be replaced")))
+    assert cli.main(["demo"]) == 0
+    assert database.read_bytes() == original
+    assert (data_dir / "import-report.json").read_bytes() == original_report
+    assert "Loading the bundled" not in capsys.readouterr().out
+    run.assert_called_once()
+
+
+def test_demo_respects_database_override(data_dir, forbid_downloads, monkeypatch):
+    database = data_dir / "custom" / "demo.sqlite"
+    monkeypatch.setenv("LOCALDDI_DB", str(database))
+    monkeypatch.setattr("uvicorn.run", Mock())
+    assert cli.main(["demo"]) == 0
+    assert database.exists()
+    assert not (data_dir / "localddi.sqlite").exists()
+
+
+def test_demo_does_not_serve_after_failed_import(data_dir, monkeypatch):
+    run = Mock()
+    monkeypatch.setattr("uvicorn.run", run)
+    monkeypatch.setattr(cli, "cmd_import", Mock(return_value=2))
+    assert cli.main(["demo"]) == 2
+    assert not (data_dir / "localddi.sqlite").exists()
+    run.assert_not_called()
 
 
 def test_check_reports_when_nothing_is_listed(data_dir, forbid_downloads, capsys):

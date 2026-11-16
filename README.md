@@ -12,18 +12,55 @@
 > [!IMPORTANT]
 > **The code is MIT. The default data is not.** `localddi import` downloads interaction data from [DDInter 2.0](https://ddinter2.scbdd.com), which is licensed **CC BY-NC-SA 4.0: non-commercial use only.** No interaction data is stored in this repository. For commercial use you need DDInter's permission or your own licensed data (`--csv`). Details: [docs/data-and-licensing.md](docs/data-and-licensing.md).
 
-## Quickstart
+## Try it in one minute
 
-You need Docker. Building and starting takes about a minute. The import is limited by NLM's download server: the 75 MB RxNorm file took me about ten minutes on the day I tested, and the import itself a few seconds. If you only want to see the API respond, use `--demo` (below) which needs no download at all.
+Try the tool with a tiny synthetic fixture to see whether it is useful to you. Choose one:
+
+**Python, no clone** (with [pipx](https://pipx.pypa.io/) or [uv](https://docs.astral.sh/uv/)):
+
+```bash
+pipx run --spec git+https://github.com/shubhamjoshipromail-svg/localddi localddi demo
+# Or:
+uvx --from git+https://github.com/shubhamjoshipromail-svg/localddi localddi demo
+```
+
+**Docker image:**
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/shubhamjoshipromail-svg/localddi localddi demo --host 0.0.0.0
+```
+
+**From a clone with Docker Compose:**
 
 ```bash
 git clone https://github.com/shubhamjoshipromail-svg/localddi
 cd localddi
 docker compose up -d --build
+docker compose run --rm api localddi import --demo
+```
+
+Open <http://localhost:8080>, select an example and click **Check**. The demo data is a tiny synthetic fixture: made-up interaction rows for trying the tool, never for real checks. Some example names are absent from the fixture and will show an incomplete answer. The page works offline and shows how each input resolved, interaction sources and data licences. The API documentation is at `/docs`.
+
+`localddi demo` loads the fixture only if no database exists; otherwise it serves the existing database. Use `--host` and `--port` to change the bind address and port. If your server requires `LOCALDDI_API_KEY`, enter it on the page; it stays in page memory.
+
+## Load real data
+
+For a Python install, run `localddi import`, then `localddi serve`. From the Docker Compose clone:
+
+```bash
 docker compose run --rm api localddi import
 ```
 
+With the registry image, use a named volume so the import and server share persistent data:
+
+```bash
+docker run --rm -it -v localddi-data:/data ghcr.io/shubhamjoshipromail-svg/localddi localddi import
+docker run --rm -p 8080:8080 -v localddi-data:/data ghcr.io/shubhamjoshipromail-svg/localddi localddi serve --host 0.0.0.0
+```
+
 The import shows DDInter's licence terms and asks you to accept them (or pass `--accept-ddinter-license`). It then downloads RxNorm and DDInter, builds a SQLite database in a Docker volume, and prints what it matched. The running server picks the database up immediately.
+
+The import is limited by NLM's download server: the 75 MB RxNorm file took me about ten minutes on the day I tested, and the import itself a few seconds. Demo mode needs no download at all.
 
 Ask it something:
 
@@ -206,7 +243,7 @@ All optional, set as environment variables (see `.env.example`):
 
 | Variable | Effect |
 |---|---|
-| `LOCALDDI_API_KEY` | Require this key (`X-API-Key` or `Authorization: Bearer`) on everything except `/health`. Off by default. |
+| `LOCALDDI_API_KEY` | Require this key (`X-API-Key` or `Authorization: Bearer`) on API endpoints except `/health`. The web page and API docs stay public. Off by default. |
 | `LOCALDDI_MIN_SEVERITY` | Hide rows below this level in every endpoint, e.g. `minor` hides "unknown". |
 | `LOCALDDI_CORS_ORIGINS` | Comma-separated browser origins to allow. None by default. |
 | `LOCALDDI_PORT` | Host port for docker compose (default 8080, bound to 127.0.0.1). |
@@ -241,7 +278,7 @@ What localddi adds is narrow: the NLM response shape, RxCUI in and out, fully of
 
 ```bash
 pip install -e '.[dev]'
-make test     # 158 tests, offline
+make test     # 167 tests, offline
 make lint
 ```
 
