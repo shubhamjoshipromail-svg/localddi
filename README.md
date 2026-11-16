@@ -14,7 +14,7 @@
 
 ## Quickstart
 
-You need Docker. The whole thing takes a few minutes, most of it the 75 MB RxNorm download.
+You need Docker. Building and starting takes about a minute. The import is limited by NLM's download server: the 75 MB RxNorm file took me about ten minutes on the day I tested, and the import itself a few seconds. If you only want to see the API respond, use `--demo` (below) and you are done in under two minutes.
 
 ```bash
 git clone https://github.com/shubhamjoshipromail-svg/localddi
@@ -227,7 +227,7 @@ What localddi adds is narrow: the NLM response shape, RxCUI in and out, fully of
 
 ```bash
 pip install -e '.[dev]'
-make test     # 130 tests, offline, about two seconds
+make test     # 134 tests, offline, about two seconds
 make lint
 ```
 
