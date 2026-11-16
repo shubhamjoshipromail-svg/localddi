@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e '.[dev]'
+      - run: ruff check .
+      - run: python -m pytest -q
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start
+        run: docker compose up -d --build
+      - name: Load the synthetic demo fixture (no licensed data in CI)
+        run: docker compose run --rm api localddi import --demo
+      - name: Query the running API
+        run: |
+          for i in $(seq 1 20); do curl -fs http://127.0.0.1:8080/health && break; sleep 1; done
+          curl -fs "http://127.0.0.1:8080/v1/interactions?drugs=warfarin,aspirin" | tee native.json
+          grep -q '"interactions_found":1' native.json
+          curl -fs "http://127.0.0.1:8080/REST/interaction/list.json?rxcuis=11289+1191" | tee nlm.json
+          grep -q '"fullInteractionTypeGroup"' nlm.json
+      - if: always()
+        run: docker compose logs && docker compose down -v

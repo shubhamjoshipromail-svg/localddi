@@ -1,0 +1,25 @@
+name: Bug report
+description: Something in the server, importer or CLI does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not paste patient information. For a wrong or missing interaction, use the "Data problem" template instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The request or command you ran, what you expected, and what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: Output of `localddi status` (or GET /v1/status)
+      render: json
+  - type: input
+    id: version
+    attributes:
+      label: localddi version and how you run it
+      placeholder: "0.1.0, docker compose on Ubuntu 24.04"

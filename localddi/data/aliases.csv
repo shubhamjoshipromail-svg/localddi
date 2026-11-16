@@ -1,0 +1,46 @@
+# International (INN/BAN) names that RxNorm's US-centric vocabulary spells differently.
+# Format: alias,rxnorm_name. An alias is only applied when rxnorm_name exists in the
+# loaded RxNorm release and the alias is not already an RxNorm name.
+alias,rxnorm_name
+acetylsalicylic acid,aspirin
+paracetamol,acetaminophen
+salbutamol,albuterol
+adrenaline,epinephrine
+noradrenaline,norepinephrine
+pethidine,meperidine
+glibenclamide,glyburide
+rifampicin,rifampin
+lignocaine,lidocaine
+frusemide,furosemide
+ciclosporin,cyclosporine
+aciclovir,acyclovir
+isoprenaline,isoproterenol
+glyceryl trinitrate,nitroglycerin
+torasemide,torsemide
+suxamethonium,succinylcholine
+levosalbutamol,levalbuterol
+norethisterone,norethindrone
+orciprenaline,metaproterenol
+phylloquinone,vitamin K1
+somatotropin,somatropin
+valaciclovir,valacyclovir
+ethinylestradiol,ethinyl estradiol
+cyanocobalamin,vitamin B12
+cholestyramine,cholestyramine resin
+colestyramine,cholestyramine resin
+calcipotriol,calcipotriene
+ursodeoxycholic acid,ursodeoxycholate
+phenylbutyric acid,phenylbutyrate
+picosulfuric acid,picosulfurate
+etacrynic acid,ethacrynate
+cromoglicic acid,cromolyn
+nicotinamide,niacinamide
+tetryzoline,tetrahydrozoline
+ulobetasol,halobetasol
+vasopressin,vasopressin (USP)
+iron dextran,iron-dextran complex
+lipoic acid,thioctic acid
+oxybuprocaine,benoxinate
+cinchocaine,dibucaine
+rifamycin,rifamycin SV
+ferrous sulfate anhydrous,ferrous sulfate

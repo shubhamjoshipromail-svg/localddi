@@ -1,0 +1,12 @@
+drug_a_id,drug_a,drug_b_id,drug_b,severity,description,management
+DEMO1,Warfarin,DEMO2,Acetylsalicylic acid,major,[DEMO] Synthetic row for testing the API. Not clinical information.,[DEMO] Synthetic management text.
+DEMO1,Warfarin,DEMO3,Fluconazole,major,,
+DEMO4,Simvastatin,DEMO3,Fluconazole,moderate,,
+DEMO3,Fluconazole,DEMO4,Simvastatin,major,[DEMO] Duplicate pair listed again with a higher level.,
+DEMO1,Warfarin,DEMO5,Ibuprofen,moderate,,
+DEMO6,Sertraline,DEMO7,Tramadol,major,,
+DEMO8,Acetaminophen,DEMO1,Warfarin,minor,,
+DEMO9,Oxycodone,DEMO6,Sertraline,Unknown,,
+DEMO10,Acyclovir (topical),DEMO5,Ibuprofen,minor,,
+DEMO11,Notarealdrug,DEMO1,Warfarin,major,,
+DEMO12,Albuterol,DEMO13,Salbutamol,minor,,

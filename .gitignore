@@ -1,0 +1,33 @@
+# Imported data and downloads: never commit these. DDInter data is CC BY-NC-SA
+# and must not be redistributed under this repository's MIT licence.
+/data/
+*.sqlite
+*.sqlite.building
+*.RRF
+!localddi/fixtures/rrf/*.RRF
+ddinter_downloads_code_*.csv
+import-report.json
+
+# Launch drafts are private
+/launch/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+/build/
+/dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment
+.env
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: >-
+  If you use localddi, please cite it, and cite the data sources you imported
+  (DDInter and RxNorm), which are separate works with their own terms.
+title: "localddi: a self-hosted drug-drug interaction API"
+type: software
+authors:
+  - family-names: Joshi
+    given-names: Shubham
+version: 0.1.0
+date-released: 2026-11-15
+license: MIT
+repository-code: "https://github.com/shubhamjoshipromail-svg/localddi"
+abstract: >-
+  A self-hosted HTTP API that answers drug-drug interaction queries by RxCUI or
+  drug name from locally imported data, with endpoints that follow the JSON
+  shape of the discontinued NLM RxNav Drug Interaction API. Not for clinical use.
+keywords:
+  - drug-drug interactions
+  - RxNorm
+  - RxNav
+  - self-hosted
+references:
+  - type: article
+    title: "DDInter: an online drug-drug interaction database towards improving clinical decision-making and patient safety"
+    authors:
+      - family-names: Xiong
+        given-names: Guoli
+      - name: "et al."
+    journal: "Nucleic Acids Research"
+    year: 2022
+    doi: 10.1093/nar/gkab880
+  - type: data
+    title: "RxNorm Current Prescribable Content"
+    authors:
+      - name: "U.S. National Library of Medicine"
+    url: "https://www.nlm.nih.gov/research/umls/rxnorm/docs/prescribe.html"

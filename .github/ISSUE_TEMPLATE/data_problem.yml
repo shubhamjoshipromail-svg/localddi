@@ -1,0 +1,26 @@
+name: Data problem
+description: A drug name is not recognised, or an interaction is missing or looks wrong
+labels: [data]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        localddi does not author interaction data. If the interaction itself is wrong in the source (for example DDInter), it has to be fixed there. What this project can fix is name matching: a drug the source lists that localddi failed to map to RxNorm, or mapped to the wrong ingredient.
+  - type: input
+    id: drugs
+    attributes:
+      label: Drug names or RxCUIs involved
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What you queried and what came back
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and where that expectation comes from
+      description: A link to the source entry or a reference helps.

@@ -1,0 +1,20 @@
+# docker compose up -d
+# docker compose run --rm api localddi import --accept-ddinter-license
+services:
+  api:
+    build: .
+    image: localddi:local
+    ports:
+      # Bound to localhost by default. Change to "8080:8080" to expose it on your network.
+      - "127.0.0.1:${LOCALDDI_PORT:-8080}:8080"
+    environment:
+      # Optional. If set, every endpoint except /health needs this key.
+      LOCALDDI_API_KEY: ${LOCALDDI_API_KEY:-}
+      # Optional. Comma-separated origins allowed to call the API from a browser.
+      LOCALDDI_CORS_ORIGINS: ${LOCALDDI_CORS_ORIGINS:-}
+    volumes:
+      - localddi-data:/data
+    restart: unless-stopped
+
+volumes:
+  localddi-data:

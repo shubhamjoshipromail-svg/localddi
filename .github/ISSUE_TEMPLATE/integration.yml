@@ -1,0 +1,18 @@
+name: Integration report
+description: You pointed an existing RxNav interaction client at localddi
+labels: [integration]
+body:
+  - type: input
+    id: client
+    attributes:
+      label: Which software or library
+      placeholder: "OpenEMR 7.0.2, custom PHP client, ..."
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What worked and what did not
+      description: Response fields your client needed that were missing or shaped differently are especially useful.
+    validations:
+      required: true
