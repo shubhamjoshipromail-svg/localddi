@@ -66,7 +66,7 @@ curl "http://localhost:8080/v1/interactions?drugs=warfarin,aspirin"
   "sources": [
     {"name": "DDInter", "version": "2.0", "url": "https://ddinter2.scbdd.com/",
      "license": "CC BY-NC-SA 4.0", "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-     "attribution": "Interaction data from DDInter 2.0 ...", "interactions": 176263}
+     "attribution": "Interaction data from DDInter 2.0 ...", "interactions": 176817}
   ]
 }
 ```
@@ -134,7 +134,7 @@ localddi check warfarin aspirin "Tylenol PM"
 - **Deterministic.** A lookup is a SQL query against a local SQLite file. The same request against the same import always gives the same response. There is no language model anywhere in it.
 - **Offline after import.** The server makes no outbound network calls and needs no API key or account. Only `localddi import` uses the network, and it can run from files you fetched yourself (`--rxnorm-zip`, `--ddinter-dir`).
 - **RxNorm-aware.** An input can be an ingredient, a US brand name, or a specific product (`simvastatin 40 MG Oral Tablet [Zocor]`); it is reduced to its ingredients using RxNorm's own relationships. A combination product is checked ingredient by ingredient.
-- **No guessing at names.** A misspelt or unknown name comes back as `"resolved": false` with suggestions, and the summary says `"complete": false`. It is never silently matched to something else.
+- **Fixed name rules, no fuzzy matching.** After an exact lookup fails, localddi tries removing a trailing qualifier, expanding abbreviations and dropping release words, stripping a trailing salt only if the remainder is an RxNorm ingredient, then resolving every part of a combination. The `match` field reports the rule used. A misspelt or unknown name stays `"resolved": false` with suggestions, and the summary says `"complete": false`; suggestions are never applied automatically.
 - **It carries the licence with the data.** Every response names its source, licence and attribution.
 - **It does not** write its own interaction data, explain mechanisms, give dosing or management advice, check food, disease or allergy interactions, or store anything about requests.
 
@@ -150,6 +150,10 @@ Native:
 | `GET /v1/drugs/{rxcui}/interactions` | Everything the loaded data lists for one drug. |
 | `GET /v1/status` | Loaded sources, their licences, counts, import date and the import report. |
 | `GET /health` | Liveness. |
+
+In native responses, each resolved drug's `match` field explains the lookup: `exact`, `alias`, `source-name` (an imported source name), `rxcui`, or a rewrite rule. Exact lookup uses a key with case, accents and punctuation normalised. `Coumadin` resolves through a built-in alias to warfarin.
+
+In 0.1.1 the fallback order is `qualifier-stripped`, `normalized`, `salt-stripped`, then `combination`. These remove trailing qualifiers such as `(topical)`, expand HCl/HBr/HCTZ/APAP/ASA and drop trailing release words such as ER/XR/XL/SR/CR/DR/ODT/HFA. A trailing salt is removed only if the remainder is an RxNorm ingredient. Combinations such as `A/B`, `A-B` or `A with B` resolve only if every part does. The rules do not measure similarity or correct misspellings. See [the evaluation](docs/evaluation.md#name-resolution-rules) for details and the limits of ingredient-level matching.
 
 NLM-compatible (JSON only):
 
@@ -175,16 +179,26 @@ Measured on the import of 15 November 2026 (all 14 DDInter files, RxNorm release
 |---|---|
 | Rows in the DDInter files | 507,655 |
 | Unique drug pairs after removing duplicates | 234,981 |
-| **Interactions stored and queryable** | **176,263 (75%)** |
-| Pairs dropped because a drug had no RxNorm match | 58,718 (25%) |
-| DDInter drugs matched to an RxNorm ingredient | 1,596 of 1,971 (81%) |
-| Severity of stored rows | major 28,327 · moderate 100,708 · minor 6,776 · unknown 40,452 |
+| **Interactions stored and queryable** | **176,817 (75%)** |
+| Pairs dropped because a drug had no RxNorm match | 58,164 (25%) |
+| DDInter drugs matched to an RxNorm ingredient | 1,598 of 1,971 (81%) |
+| Severity of stored rows | major 28,339 · moderate 101,194 · minor 6,832 · unknown 40,452 |
 
-The unmatched 19% are mostly drugs no longer marketed in the United States (RxNorm's free subset covers currently prescribable US drugs), vaccines and herbal products named differently in the two vocabularies. Every unmatched name is written to `import-report.json`. This also means some names you might expect to work do not: `Coumadin`, for instance, is not in the current prescribable subset, while `warfarin` and `Jantoven` are.
+The 373 unmatched drugs (19%) are mostly drugs no longer marketed in the United States (RxNorm's free subset covers currently prescribable US drugs), vaccines and herbal products named differently in the two vocabularies. Every unmatched name is written to `import-report.json`.
 
-Eleven well-known pairs were spot-checked by hand and came back as listed interactions (warfarin + aspirin, sildenafil + nitroglycerin, simvastatin + clarithromycin, methotrexate + trimethoprim, fluoxetine + tramadol, amiodarone + digoxin and others). That is a smoke test, not a validation. There has been no systematic comparison against a clinical reference.
+## How good is it?
+
+The 0.1.1 evaluation checks pair overlap and name resolution, not clinical correctness:
+
+- **ONC high-priority list:** 721 of 793 testable pairs are listed (90.9%); 663 are major (83.6% of testable pairs), and 58 are moderate. Another 357 pairs are untestable because a drug is absent from the current prescribable RxNorm subset.
+- **Archived NLM DrugBank responses:** 883 of 3,050 testable pairs are listed (29%). DDInter covers far fewer pairs than DrugBank did in these captures. The archived drugs are not a designed sample, so this is not a population-wide coverage estimate.
+- **CMS Medicare Part D, 2024 claims:** 94 of the 100 most-dispensed generic names and 96 of the top 100 brand names resolve, up from 70 and 68 before the rewrite rules. Resolving a name does not mean its interactions are covered.
+
+Read [the methods, results and reproduction instructions](docs/evaluation.md), including the missing pairs and unknown severity levels. Clinical correctness, false positives and DDInter's own accuracy were not measured, and localddi has not been tested inside OpenEMR. Eleven well-known pairs were also spot-checked by hand and were listed; that was a smoke test, not a validation.
 
 One judgement call you should know about: DDInter's download page links 8 of its 14 per-category files. The other 6 (cardiovascular, genito-urinary, anti-infective, musculoskeletal, nervous system, sensory organs) sit in the same download directory on DDInter's server but are not linked. localddi downloads all 14 by default, because with only the linked 8 a pair such as sildenafil + nitroglycerin is missing. Pass `--ddinter-linked-only` if you would rather use only what the page links.
+
+All 14 ATC category files (A B C D G H J L M N P R S V) use the same five-column format. Per file, 81–85% of drugs match RxNorm and 66–84% of pairs are kept. Import now warns if any of the 14 files is missing.
 
 ## Configuration
 
@@ -227,7 +241,7 @@ What localddi adds is narrow: the NLM response shape, RxCUI in and out, fully of
 
 ```bash
 pip install -e '.[dev]'
-make test     # 134 tests, offline, about two seconds
+make test     # 158 tests, offline
 make lint
 ```
 

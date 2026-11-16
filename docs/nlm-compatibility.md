@@ -15,6 +15,8 @@ The response shapes were taken from two real NLM responses preserved by the Inte
 
 `tests/test_nlm_compat.py` asserts that localddi's responses have the same keys at every level as those archived responses. It does not compare content: the data is different (see below).
 
+A separate [0.1.1 evaluation](evaluation.md#archived-nlm-responses) compares pair content across 52 archived responses. localddi lists only 883 of 3,050 testable DrugBank pairs (29%). DDInter covers far fewer pairs than DrugBank did in those captures. The archived drugs are not a designed sample, and this comparison is not clinical validation.
+
 No live side-by-side comparison was possible, because the original service no longer exists. Nobody has yet reported running a production client against localddi. If you do, please open an "Integration report" issue.
 
 ## Endpoints
@@ -65,7 +67,7 @@ fullInteractionTypeGroup[]            one per data source
 4. **`nlmDisclaimer` keeps its key but not its text.** It states that the response does not come from NLM and repeats the not-for-clinical-use warning.
 5. **`sourceDisclaimer` carries the data licence and attribution** of the imported source.
 6. **`comment` follows NLM's wording pattern** but is assembled by localddi.
-7. **Coverage differs.** Only drugs that localddi could match to an ingredient in RxNorm's *prescribable* subset are queryable. See [data-and-licensing.md](data-and-licensing.md) for the measured numbers.
+7. **Coverage differs.** Only drugs that localddi could match to an ingredient in RxNorm's *prescribable* subset are queryable. Even when both drugs resolve, the imported source may not list their pair. See [evaluation.md](evaluation.md) for the ONC, archived NLM and name-resolution comparisons, and [data-and-licensing.md](data-and-licensing.md) for import coverage.
 8. **Unverified detail:** for `interaction.json` with a non-ingredient RxCUI (a brand or a tablet), `minConceptItem` is set to the input concept. The one archived response available used an ingredient as input, so it does not show which concept NLM placed there.
 
 ## Switching an existing client
@@ -80,7 +82,7 @@ OpenEMR's prescription screen has the NLM URL hard-coded in `controllers/C_Presc
 $response = oeHttp::get('https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=' . $rxcui_list);
 ```
 
-Changing the host in that line to your localddi server is the whole patch. OpenEMR then reads `fullInteractionTypeGroup[0].fullInteractionType[*]` and prints `comment`, `minConcept[0].name`, `minConcept[1].name`, `interactionPair[0].severity` and `interactionPair[0].description`; localddi returns all of those fields.
+The proposed patch changes the host in that line to your localddi server. OpenEMR's source reads `fullInteractionTypeGroup[0].fullInteractionType[*]` and prints `comment`, `minConcept[0].name`, `minConcept[1].name`, `interactionPair[0].severity` and `interactionPair[0].description`; localddi returns all of those fields.
 
 **This has not been tested inside a running OpenEMR install.** It is based on reading OpenEMR's source and matching the fields it uses. Because OpenEMR reads only the first group, it will show one source's results if you import more than one.
 
